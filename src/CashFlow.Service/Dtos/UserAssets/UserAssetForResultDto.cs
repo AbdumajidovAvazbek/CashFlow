@@ -1,6 +1,6 @@
 ﻿namespace CashFlow.Service.Dtos.UserAssets;
 
-public class UserAssetForResult
+public class UserAssetForResultDto
 {
     public long Id { get; set; }
     public long UserId { get; set; }
