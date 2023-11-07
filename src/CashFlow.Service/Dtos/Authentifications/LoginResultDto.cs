@@ -1,6 +1,6 @@
 ﻿namespace CashFlow.Service.Dtos.Authentifications;
 
-public class LoginResulDto
+public class LoginResultDto
 {
     public string Token { get; set; }
 }

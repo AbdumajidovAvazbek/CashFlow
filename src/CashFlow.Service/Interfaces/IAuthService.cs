@@ -4,5 +4,5 @@ namespace CashFlow.Service.Interfaces;
 
 public interface IAuthService
 {
-    public Task<LoginResulDto> AuthenticateAsync(LoginDto login);
+    public Task<LoginResultDto> AuthenticateAsync(LoginDto login);
 }

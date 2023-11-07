@@ -1,10 +1,10 @@
 ﻿namespace CashFlow.Service.Exceptions;
 
-public class CashFlowExseption : Exception
+public class CashFlowException : Exception
 {
     public int _statusCode {  get; set; }
 
-    public CashFlowExseption(int code,string message) : base (message)
+    public CashFlowException(int code,string message) : base (message)
     {
         _statusCode = code;
     }

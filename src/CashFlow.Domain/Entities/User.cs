@@ -10,4 +10,5 @@ public class User : Auditable
     public string Email { get; set; }
     public string Password { get; set; }
     public GenderType Type { get; set; }
+    public ICollection<UserAsset> userAssets { get; set; }
 }
