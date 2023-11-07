@@ -1,5 +1,5 @@
-﻿using CashFlow.Domain.Commons;
-using CashFlow.Domain.Enums;
+﻿using CashFlow.Domain.Enums;
+using CashFlow.Domain.Commons;
 
 namespace CashFlow.Domain.Entities;
 

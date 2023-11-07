@@ -1,5 +1,5 @@
-﻿using CashFlow.Domain.Commons;
-using CashFlow.Domain.Enums;
+﻿using CashFlow.Domain.Enums;
+using CashFlow.Domain.Commons;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CashFlow.Domain.Entities;
