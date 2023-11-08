@@ -1,9 +1,9 @@
 using CashFlow.Api.Extensions;
+using CashFlow.Api.MiddleWare;
 using CashFlow.Data.DbContexts;
-using CashFlow.Service.Mappers;
+using CashFlow.Service.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +18,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCustomService();
-builder.Services.AddAutoMapper(typeof(MapingProfile));
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+var logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext().CreateLogger();
+
+builder.Logging.ClearProviders(); builder.Logging.AddSerilog(logger);
 
 var app = builder.Build();
+
+WebHostEnvironmentHelper.WebRootPath = Path.GetFullPath("wwwroot");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -32,6 +39,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+
+app.UseMiddleware<ExceptionHendlerMiddleWare>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

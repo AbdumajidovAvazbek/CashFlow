@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using CashFlow.Service.Dtos.Users;
 using CashFlow.Service.Interfaces;
 using System.Threading.Tasks;
+using CashFlow.Service.Configurations;
+using System.Reflection.Metadata;
 
 namespace CashFlow.Api.Controllers
 {
@@ -22,9 +24,21 @@ namespace CashFlow.Api.Controllers
 
         [HttpPost, AllowAnonymous]
         public async Task<IActionResult> PostAsync([FromBody] UserForCreationDto dto)
-        {
-            var result = await _userService.AddAsync(dto);
-            return Ok(result);
-        }
+        => Ok(await _userService.AddAsync(dto));
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams @params)
+            => Ok(await _userService.RetrieveAllAsync(@params));
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAsync([FromRoute(Name = "id")] long id)
+            => Ok(await _userService.RetrieveByIdAsync(id));
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync([FromRoute(Name = "id")] long id)
+            => Ok(await _userService.RemoveAsync(id));
+
     }
 }

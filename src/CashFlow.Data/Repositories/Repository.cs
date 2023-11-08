@@ -1,6 +1,7 @@
 ﻿using CashFlow.Data.DbContexts;
 using CashFlow.Data.IRepositories;
 using CashFlow.Domain.Commons;
+using CashFlow.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CashFlow.Data.Repositories;

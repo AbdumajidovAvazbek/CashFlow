@@ -9,5 +9,5 @@ public interface IWalletService
     public Task<WalletForResultDto> RetrieveByIdAsync(long id);
     public Task<IEnumerable<WalletForResultDto>> RetrieveAllAsync(PaginationParams @params);
     public Task<WalletForResultDto> ModifyAsync(long id, WalletForUpdateDto dto);
-    public Task<WalletForResultDto> CreateAsync(WalletForUpdateDto dto);
+    public Task<WalletForResultDto> AddAsync(WalletForCreationDto dto);
 }
