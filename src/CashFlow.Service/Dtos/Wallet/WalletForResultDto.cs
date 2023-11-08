@@ -1,12 +1,12 @@
-﻿using CashFlow.Domain.Commons;
+﻿using CashFlow.Domain.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CashFlow.Domain.Entities;
+namespace CashFlow.Service.Dtos.Wallet;
 
-public class Wallet : Auditable
+public class WalletForResultDto
 {
+    public long Id { get; set; }
     public long UserId { get; set; }
-    public User User { get; set; }
 
     [Column(TypeName = "decimal(10,2)")]
     public decimal Amount { get; set; }

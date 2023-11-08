@@ -1,4 +1,5 @@
 ﻿using CashFlow.Domain.Commons;
+using CashFlow.Domain.Entities;
 
 namespace CashFlow.Data.IRepositories;
 
