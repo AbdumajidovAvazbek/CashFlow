@@ -89,13 +89,8 @@ public class FinancialGoalService : IFinancialGoalService
         return _mapper.Map<IEnumerable<FinancialGoalForResultDto>>(financials);
     }
 
-    public async Task<FinancialGoalForResultDto> RetrieveByIdAsync(long userId,long id)
+    public async Task<FinancialGoalForResultDto> RetrieveByIdAsync(long id)
     {
-        var user = await _userService.SelectAll()
-            .Where(u => u.Id == userId)
-            .FirstOrDefaultAsync();
-        if (user is null)
-            throw new CashFlowException(404, "user is not found");
         var financial = await _financialGoalRepository.SelectAll()
                 .Where(u => u.Id == id)
                 .FirstOrDefaultAsync();

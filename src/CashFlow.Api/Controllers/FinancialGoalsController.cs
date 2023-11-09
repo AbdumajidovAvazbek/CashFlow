@@ -28,8 +28,8 @@ namespace CashFlow.Api.Controllers
             => Ok(await _financialGoalService.RetrieveAllAsync(@params));
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAsync(long userId, long id)
-            => Ok(await _financialGoalService.RetrieveByIdAsync(userId,id));
+        public async Task<IActionResult> GetAsync(long id)
+            => Ok(await _financialGoalService.RetrieveByIdAsync(id));
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(long userId, long id, [FromBody] FinancialGoalForUpdateDto dto)
