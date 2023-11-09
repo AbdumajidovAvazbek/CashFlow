@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CashFlow.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigrations : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,7 +34,7 @@ namespace CashFlow.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FinancialGoal",
+                name: "FinancialGoals",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -51,9 +51,9 @@ namespace CashFlow.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FinancialGoal", x => x.Id);
+                    table.PrimaryKey("PK_FinancialGoals", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FinancialGoal_Users_UserId",
+                        name: "FK_FinancialGoals_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -85,6 +85,33 @@ namespace CashFlow.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserAssets",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    DeletedBy = table.Column<long>(type: "bigint", nullable: true),
+                    UpdatedBy = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Path = table.Column<string>(type: "text", nullable: false),
+                    Extension = table.Column<string>(type: "text", nullable: false),
+                    Size = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserAssets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserAssets_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Wallets",
                 columns: table => new
                 {
@@ -92,7 +119,6 @@ namespace CashFlow.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
                     DeletedBy = table.Column<long>(type: "bigint", nullable: true),
                     UpdatedBy = table.Column<long>(type: "bigint", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -117,7 +143,7 @@ namespace CashFlow.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     WalletId = table.Column<long>(type: "bigint", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
                     Type = table.Column<byte>(type: "smallint", nullable: false),
                     DeletedBy = table.Column<long>(type: "bigint", nullable: true),
                     UpdatedBy = table.Column<long>(type: "bigint", nullable: true),
@@ -136,8 +162,8 @@ namespace CashFlow.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_FinancialGoal_UserId",
-                table: "FinancialGoal",
+                name: "IX_FinancialGoals_UserId",
+                table: "FinancialGoals",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -151,6 +177,11 @@ namespace CashFlow.Data.Migrations
                 column: "WalletId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserAssets_UserId",
+                table: "UserAssets",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Wallets_UserId",
                 table: "Wallets",
                 column: "UserId");
@@ -160,13 +191,16 @@ namespace CashFlow.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "FinancialGoal");
+                name: "FinancialGoals");
 
             migrationBuilder.DropTable(
                 name: "Reports");
 
             migrationBuilder.DropTable(
                 name: "Transactions");
+
+            migrationBuilder.DropTable(
+                name: "UserAssets");
 
             migrationBuilder.DropTable(
                 name: "Wallets");

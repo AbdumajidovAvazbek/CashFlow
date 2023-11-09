@@ -7,6 +7,4 @@ public class Auditable
     public long? UpdatedBy { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
-
-
 }
