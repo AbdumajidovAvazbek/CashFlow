@@ -32,11 +32,11 @@ namespace CashFlow.Api.Controllers
             => Ok(await _financialGoalService.RetrieveByIdAsync(id));
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAsync(long id, [FromBody] FinancialGoalForUpdateDto dto)
-            => Ok(await _financialGoalService.ModifyAsync(id, dto));
+        public async Task<IActionResult> PutAsync(long userId, long id, [FromBody] FinancialGoalForUpdateDto dto)
+            => Ok(await _financialGoalService.ModifyAsync(userId, id, dto));
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(long id)
-            => Ok(await _financialGoalService.RemoveAsync(id));
+        public async Task<IActionResult> DeleteAsync(long userId, long id)
+            => Ok(await _financialGoalService.RemoveAsync(userId, id));
     }
 }

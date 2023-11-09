@@ -62,7 +62,7 @@ namespace CashFlow.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("FinancialGoal");
+                    b.ToTable("FinancialGoals");
                 });
 
             modelBuilder.Entity("CashFlow.Domain.Entities.Report", b =>
@@ -223,7 +223,7 @@ namespace CashFlow.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserAsset");
+                    b.ToTable("UserAssets");
                 });
 
             modelBuilder.Entity("CashFlow.Domain.Entities.Wallet", b =>
@@ -262,7 +262,7 @@ namespace CashFlow.Data.Migrations
             modelBuilder.Entity("CashFlow.Domain.Entities.FinancialGoal", b =>
                 {
                     b.HasOne("CashFlow.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("financialGoals")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -273,7 +273,7 @@ namespace CashFlow.Data.Migrations
             modelBuilder.Entity("CashFlow.Domain.Entities.Report", b =>
                 {
                     b.HasOne("CashFlow.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Reports")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -306,7 +306,7 @@ namespace CashFlow.Data.Migrations
             modelBuilder.Entity("CashFlow.Domain.Entities.Wallet", b =>
                 {
                     b.HasOne("CashFlow.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("wallets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -316,7 +316,13 @@ namespace CashFlow.Data.Migrations
 
             modelBuilder.Entity("CashFlow.Domain.Entities.User", b =>
                 {
+                    b.Navigation("Reports");
+
+                    b.Navigation("financialGoals");
+
                     b.Navigation("userAssets");
+
+                    b.Navigation("wallets");
                 });
 
             modelBuilder.Entity("CashFlow.Domain.Entities.Wallet", b =>

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CashFlow.Data.Migrations
 {
     [DbContext(typeof(CashFlowDbContext))]
-    [Migration("20231107142237_InitialMigrations")]
-    partial class InitialMigrations
+    [Migration("20231109055645_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,7 +65,7 @@ namespace CashFlow.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("FinancialGoal");
+                    b.ToTable("FinancialGoals");
                 });
 
             modelBuilder.Entity("CashFlow.Domain.Entities.Report", b =>
@@ -119,7 +119,6 @@ namespace CashFlow.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<byte>("Type")
@@ -185,6 +184,51 @@ namespace CashFlow.Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("CashFlow.Domain.Entities.UserAsset", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserAssets");
+                });
+
             modelBuilder.Entity("CashFlow.Domain.Entities.Wallet", b =>
                 {
                     b.Property<long>("Id")
@@ -201,10 +245,6 @@ namespace CashFlow.Data.Migrations
 
                     b.Property<long?>("DeletedBy")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -225,7 +265,7 @@ namespace CashFlow.Data.Migrations
             modelBuilder.Entity("CashFlow.Domain.Entities.FinancialGoal", b =>
                 {
                     b.HasOne("CashFlow.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("financialGoals")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -236,7 +276,7 @@ namespace CashFlow.Data.Migrations
             modelBuilder.Entity("CashFlow.Domain.Entities.Report", b =>
                 {
                     b.HasOne("CashFlow.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Reports")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -255,15 +295,37 @@ namespace CashFlow.Data.Migrations
                     b.Navigation("Wallet");
                 });
 
-            modelBuilder.Entity("CashFlow.Domain.Entities.Wallet", b =>
+            modelBuilder.Entity("CashFlow.Domain.Entities.UserAsset", b =>
                 {
                     b.HasOne("CashFlow.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("userAssets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CashFlow.Domain.Entities.Wallet", b =>
+                {
+                    b.HasOne("CashFlow.Domain.Entities.User", "User")
+                        .WithMany("wallets")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CashFlow.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Reports");
+
+                    b.Navigation("financialGoals");
+
+                    b.Navigation("userAssets");
+
+                    b.Navigation("wallets");
                 });
 
             modelBuilder.Entity("CashFlow.Domain.Entities.Wallet", b =>

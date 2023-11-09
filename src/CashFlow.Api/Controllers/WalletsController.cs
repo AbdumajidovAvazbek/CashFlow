@@ -29,16 +29,16 @@ namespace CashFlow.Api.Controllers
             => Ok(await _walletService.RetrieveAllAsync(@params));
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAsync( long id)
-            => Ok(await _walletService.RetrieveByIdAsync(id));
+        public async Task<IActionResult> GetAsync(long userId, long id)
+            => Ok(await _walletService.RetrieveByIdAsync(userId, id));
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAsync(long id, [FromBody] WalletForUpdateDto dto)
-            => Ok(await _walletService.ModifyAsync(id, dto));
+        public async Task<IActionResult> PutAsync(long userId,long id, [FromBody] WalletForUpdateDto dto)
+            => Ok(await _walletService.ModifyAsync(userId,id, dto));
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync([FromRoute(Name = "id")] long id)
-            => Ok(await _walletService.RemoveAsync(id));
+        public async Task<IActionResult> DeleteAsync(long userId, long id)
+            => Ok(await _walletService.RemoveAsync(userId,id));
 
     }
 }

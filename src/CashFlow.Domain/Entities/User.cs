@@ -11,4 +11,7 @@ public class User : Auditable
     public string Password { get; set; }
     public GenderType Type { get; set; }
     public ICollection<UserAsset> userAssets { get; set; }
+    public ICollection<FinancialGoal> financialGoals { get; set; }
+    public ICollection<Wallet> wallets { get; set; }
+    public ICollection<Report> Reports { get; set; }
 }

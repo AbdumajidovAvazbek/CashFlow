@@ -1,135 +1,115 @@
 ﻿using AutoMapper;
-using CashFlow.Data.IRepositories;
 using CashFlow.Domain.Entities;
 using CashFlow.Service.Configurations;
 using CashFlow.Service.Dtos.UserAssets;
-using CashFlow.Service.Exceptions;
-using CashFlow.Service.Extensions;
-using CashFlow.Service.Helpers;
 using CashFlow.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using CashFlow.Data.IRepositories;
+using CashFlow.Service.Exceptions;
+using CashFlow.Service.Extensions;
+using CashFlow.Service.Helpers;
+using System.Security.Claims;
+using CashFlow.Service.Dtos.Reports;
 
-namespace CashFlow.Service.Services
+namespace Shamsheer.Service.Services.UserAssets;
+
+public class UserAssetService : IUserAssetService
 {
-    public class UserAssetService : IUserAssetService
+    private readonly IMapper _mapper;
+    private readonly IRepository<User> _userRepository;
+    private readonly IRepository<UserAsset> _userAssetRepository;
+    private readonly IRepository<Asset> _assetRepository;
+
+    public UserAssetService(IMapper mapper, IRepository<User> userRepository, IRepository<UserAsset> userAssetRepository, IRepository<Asset> assetRepository )
     {
-        private readonly IMapper _mapper;
-        private readonly IRepository<UserAsset> _userAssetRepository;
-        private readonly IRepository<User> _userRepository;
-        private readonly WebHostEnvironmentHelper _webHostEnvironment;
+        _mapper = mapper;
+        _userRepository = userRepository;
+        _userAssetRepository = userAssetRepository;
+        _assetRepository = assetRepository;
+    }
+    public async Task<UserAssetForResultDto> AddAsync(IFormFile formFile)
+    {
+        //Identify UserId TODO:LOGIC
+        long userId = (long)HttpContextHelper.UserId;
 
-        public UserAssetService(
-            IMapper mapper,
-            IRepository<User> userRepository,
-            IRepository<UserAsset> userAssetRepository)
+        var fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(formFile.FileName);
+        var rootPath = Path.Combine(WebHostEnvironmentHelper.WebRootPath, "Media", "ProfilePictures", "Users", fileName);
+        using (var stream = new FileStream(rootPath, FileMode.Create))
         {
-            _mapper = mapper;
-            _userRepository = userRepository;
-            _userAssetRepository = userAssetRepository;
+            await formFile.CopyToAsync(stream);
+            await stream.FlushAsync();
+            stream.Close();
         }
 
-        public async Task<UserAssetForResultDto> AddAsync(IFormFile file)
+        var mappedAsset = new UserAsset()
         {
-            // Logic to add an asset to the system
-            var rootPath = Path.Combine(WebHostEnvironmentHelper.WebRootPath, "assets");
-            Directory.CreateDirectory(rootPath);
+            UserId = userId,
+            Name = fileName,
+            Path = Path.Combine("Media", "ProfilePictures", "Users", formFile.FileName),
+            Extension = Path.GetExtension(formFile.FileName),
+            Size = formFile.Length,
+            CreatedAt = DateTime.UtcNow
+        };
 
-            var fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
-            var path = Path.Combine(rootPath, fileName);
+        var result = await _userAssetRepository.InsertAsync(mappedAsset);
 
-            using (var stream = File.OpenWrite(path))
-            {
-                await file.CopyToAsync(stream);
-            }
+        return _mapper.Map<UserAssetForResultDto>(result);
+    }
 
-            var asset = new UserAsset()
-            {
-                CreatedAt = DateTime.UtcNow,
-                Path = Path.Combine("assets", fileName),
-                // Set other properties of the asset as needed
-            };
+    public async Task<bool> RemoveAsync(long userId, long id)
+    {
+        var user = await _userRepository.SelectAll()
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
+        if (user is null)
+            throw new CashFlowException(404, "User is not found.");
 
-            var result = await _userAssetRepository.InsertAsync(asset);
+        var userAsset = await _userAssetRepository.SelectAll()
+            .Where(ur => ur.Id == id)
+            .FirstOrDefaultAsync();
+        if (userAsset is null)
+            throw new CashFlowException(404, "User Asset is not found.");
 
-            return _mapper.Map<UserAssetForResultDto>(result);
-        }
 
-        public async Task<bool> RemoveAsync(long userId, long id)
-        {
-            // Logic to remove an asset by ID
-            var user = await _userRepository.SelectAll()
-                .Where(u => u.Id == userId)
-                .FirstOrDefaultAsync();
+        await _userAssetRepository.DeleteAsync(userAsset.Id);
 
-            if (user is null)
-            {
-                throw new CashFlowException(404, "User is not found.");
-            }
+        return true;
+    }
 
-            var userAsset = await _userAssetRepository.SelectAll()
-                .Where(ur => ur.Id == id)
-                .FirstOrDefaultAsync();
+    public async Task<IEnumerable<UserAssetForResultDto>> RetrieveAllAsync(long userId, PaginationParams @params)
+    {
+        var user = await _userRepository.SelectAll()
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
 
-            if (userAsset is null)
-            {
-                throw new CashFlowException(404, "User Asset is not found.");
-            }
+        if (user is null)
+            throw new CashFlowException(404, "User is not found.");
+        var userAsset = await _assetRepository.SelectAll()
+            .ToPagedList(@params)
+           .ToListAsync();
 
-            await _userAssetRepository.DeleteAsync(userAsset.Id);
+        return _mapper.Map<IEnumerable<UserAssetForResultDto>>(userAsset);
+    }
 
-            return true;
-        }
+    public async Task<UserAssetForResultDto> RetrieveByIdAsync(long userId, long id)
+    {
+        var user = await _userRepository.SelectAll()
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
 
-        public async Task<IEnumerable<UserAssetForResultDto>> RetrieveAllAsync(long userId, PaginationParams @params)
-        {
-            // Logic to retrieve all assets for a user with pagination
-            var user = await _userRepository.SelectAll()
-                .Where(u => u.Id == userId)
-                .FirstOrDefaultAsync();
+        if (user is null)
+            throw new CashFlowException(404, "User is not found.");
 
-            if (user is null)
-            {
-                throw new CashFlowException(404, "User is not found.");
-            }
+        var userAsset = await _userAssetRepository.SelectAll()
+            .Where(u => u.Id == id)
+            .FirstOrDefaultAsync();
 
-            var assets = await _userAssetRepository.SelectAll()
-                .ToPagedList(@params)
-                .ToListAsync();
+        if (userAsset is null)
+            throw new CashFlowException(404, "User Asset is not found.");
 
-            return _mapper.Map<IEnumerable<UserAssetForResultDto>>(assets);
+        var mappedAsset = _mapper.Map<UserAssetForResultDto>(userAsset);
 
-        }
-
-        public async Task<UserAssetForResultDto> RetrieveByIdAsync(long userId, long id)
-        {
-            // Logic to retrieve an asset by ID
-            var user = await _userRepository.SelectAll()
-                .Where(u => u.Id == userId)
-                .FirstOrDefaultAsync();
-
-            if (user is null)
-            {
-                throw new CashFlowException(404, "User is not found.");
-            }
-
-            var userAsset = await _userAssetRepository.SelectAll()
-                .Where(u => u.Id == id)
-                .FirstOrDefaultAsync();
-
-            if (userAsset is null)
-            {
-                throw new CashFlowException(404, "User Asset is not found.");
-            }
-
-            var mappedAsset = _mapper.Map<UserAssetForResultDto>(userAsset);
-
-            return mappedAsset;
-        }
+        return mappedAsset;
     }
 }

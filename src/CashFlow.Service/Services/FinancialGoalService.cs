@@ -15,22 +15,23 @@ namespace CashFlow.Service.Services;
 public class FinancialGoalService : IFinancialGoalService
 {
     private readonly IRepository<FinancialGoal> _financialGoalRepository;
+    private readonly IRepository<User> _userService;
     private readonly IMapper _mapper;
 
-    public FinancialGoalService(IMapper mapper, IRepository<FinancialGoal> finansialGoal)
+    public FinancialGoalService(IMapper mapper, IRepository<FinancialGoal> finansialGoal, IRepository<User> userService)
     {
         _mapper = mapper;
         _financialGoalRepository = finansialGoal;
+        _userService = userService;
     }
 
     public async Task<FinancialGoalForResultDto> AddAsync(FinancialGoalForCreationDto dto)
     {
-        var finansial = await _financialGoalRepository.SelectAll()
-            .Where(f => f.UserId == dto.UserId && f.Name == dto.Name)
-            .AsNoTracking()
+        var user = await _userService.SelectAll()
+            .Where(u => u.Id == dto.UserId)
             .FirstOrDefaultAsync();
-        if (finansial is not null)
-            throw new CashFlowException(409, "FinancialGoal  is already exist.");
+        if (user is null)
+            throw new CashFlowException(404, "user is not found");
 
         var mapperFinancial = _mapper.Map<FinancialGoal>(dto);
         mapperFinancial.CreatedAt = DateTime.UtcNow;
@@ -40,8 +41,14 @@ public class FinancialGoalService : IFinancialGoalService
 
     }
 
-    public async Task<FinancialGoalForResultDto> ModifyAsync(long id, FinancialGoalForUpdateDto dto)
+    public async Task<FinancialGoalForResultDto> ModifyAsync(long userId, long id, FinancialGoalForUpdateDto dto)
     {
+        var user = await _userService.SelectAll()
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
+        if (user is null)
+            throw new CashFlowException(404, "user is not found");
+
         var financial = await _financialGoalRepository.SelectAll()
                .Where(u => u.Id == id)
                .FirstOrDefaultAsync();
@@ -56,8 +63,13 @@ public class FinancialGoalService : IFinancialGoalService
         return _mapper.Map<FinancialGoalForResultDto>(mappedFinancial);
     }
 
-    public async Task<bool> RemoveAsync(long id)
+    public async Task<bool> RemoveAsync(long userId, long id)
     {
+        var user = await _userService.SelectAll()
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
+        if (user is null)
+            throw new CashFlowException(404, "user is not found");
         var financial = await _financialGoalRepository.SelectAll()
                 .Where(u => u.Id == id)
                 .FirstOrDefaultAsync();
