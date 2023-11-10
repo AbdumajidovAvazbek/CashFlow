@@ -19,19 +19,22 @@ public class UserAssetService : IUserAssetService
     private readonly IMapper _mapper;
     private readonly IRepository<User> _userRepository;
     private readonly IRepository<UserAsset> _userAssetRepository;
-    private readonly IRepository<Asset> _assetRepository;
 
-    public UserAssetService(IMapper mapper, IRepository<User> userRepository, IRepository<UserAsset> userAssetRepository, IRepository<Asset> assetRepository )
+    public UserAssetService(IMapper mapper, IRepository<User> userRepository, IRepository<UserAsset> userAssetRepository)
     {
         _mapper = mapper;
         _userRepository = userRepository;
         _userAssetRepository = userAssetRepository;
-        _assetRepository = assetRepository;
     }
-    public async Task<UserAssetForResultDto> AddAsync(IFormFile formFile)
+    public async Task<UserAssetForResultDto> CreateAsync(IFormFile formFile)
     {
         //Identify UserId TODO:LOGIC
-        long userId = (long)HttpContextHelper.UserId;
+        long userId = 1; //Actually this one is takes from jwt token, now we need to give default value
+        var user = await _userRepository.SelectAll()
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
+        if (user is null)
+            throw new CashFlowException(404, "User is not found.");
 
         var fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(formFile.FileName);
         var rootPath = Path.Combine(WebHostEnvironmentHelper.WebRootPath, "Media", "ProfilePictures", "Users", fileName);
@@ -49,6 +52,7 @@ public class UserAssetService : IUserAssetService
             Path = Path.Combine("Media", "ProfilePictures", "Users", formFile.FileName),
             Extension = Path.GetExtension(formFile.FileName),
             Size = formFile.Length,
+            Type = formFile.ContentType,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -85,7 +89,7 @@ public class UserAssetService : IUserAssetService
 
         if (user is null)
             throw new CashFlowException(404, "User is not found.");
-        var userAsset = await _assetRepository.SelectAll()
+        var userAsset = await _userAssetRepository.SelectAll()
             .ToPagedList(@params)
            .ToListAsync();
 

@@ -20,7 +20,6 @@ public static class ServiceExstensions
         services.AddScoped<IFinancialGoalService, FinancialGoalService>();
         services.AddScoped<IWalletService, WalletService>();
         services.AddScoped<ITransactionService, TransactionService>();
-        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IUserAssetService, UserAssetService>();
         services.AddScoped<IAuthService, AuthService>();

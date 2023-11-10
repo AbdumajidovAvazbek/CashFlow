@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Files\assets\" />
+    <Folder Include="wwwroot\Media\ProfilePictures\Users\" />
   </ItemGroup>
 
 </Project>

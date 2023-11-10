@@ -19,7 +19,7 @@ public class UserAssetsController : BaseController
     public async Task<IActionResult> PostAsync(
     [Required(ErrorMessage = "Please, select file ...")]
     [DataType(DataType.Upload)] IFormFile file)
-    => Ok(await _userAssetService.AddAsync(file));
+    => Ok(await _userAssetService.CreateAsync(file));
 
     [HttpGet("{user-id}")]
     public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams @params, [FromRoute] long userId)
@@ -32,4 +32,5 @@ public class UserAssetsController : BaseController
     [HttpDelete("{user-id}/{id}")]
     public async Task<IActionResult> DeleteAsync([FromRoute(Name = "userId")] long userId, [FromRoute(Name = "id")] long id)
         => Ok(await _userAssetService.RemoveAsync(userId, id));
+
 }

@@ -7,12 +7,11 @@ namespace CashFlow.Service.Dtos.Users;
 public class UserForResultDto
 {
     public long Id { get; set; }
-    public string Name { get; set; }
-    public string Surname { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
     public string Email { get; set; }
+    public string Description { get; set; }
+    public string Username { get; set; }
+    public ICollection<UserAssetForResultDto> Assets { get; set; }
 
-    public ICollection<UserAssetForResultDto> userAssetsResultDto { get; set; }
-    public ICollection<FinancialGoal> financialGoals { get; set; }
-    public ICollection<WalletForResultDto> wallets { get; set; }
-    public ICollection<Report> Reports { get; set; }
 }
