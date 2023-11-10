@@ -14,19 +14,13 @@ public class UserService : IUserService
 {
     private readonly IRepository<User> _userRepository;
     private readonly IMapper _mapper;
-    private readonly IRepository<Asset> _assetRepository;
-    private readonly IRepository<UserAsset> _userAssetRepository;
 
     public UserService(
         IMapper mapper,
-        IRepository<User> userRepository,
-        IRepository<Asset> assetRepository,
-        IRepository<UserAsset> userAssetRepository)
+        IRepository<User> userRepository)
     {
         _mapper = mapper;
         _userRepository = userRepository;
-        _assetRepository = assetRepository;
-        _userAssetRepository = userAssetRepository;
     }
 
     public async Task<UserForResultDto> AddAsync(UserForCreationDto dto)
@@ -76,8 +70,10 @@ public class UserService : IUserService
 
     public async Task<IEnumerable<UserForResultDto>> RetrieveAllAsync(PaginationParams @params)
     {
+        
         var user = await _userRepository.SelectAll()
             .Include(u => u.userAssets)
+            .AsNoTracking()
             .ToPagedList(@params)
             .ToListAsync();
 
@@ -94,7 +90,6 @@ public class UserService : IUserService
             throw new CashFlowException(404, "User is not found");
 
         return _mapper.Map<UserForResultDto>(users);
-        throw new NotImplementedException();
     }
 
     public async Task<UserForResultDto> RetrieveByIdAsync(long id)

@@ -8,4 +8,5 @@ public class UserAssetForResultDto
     public string Path { get; set; }
     public string Extension { get; set; }
     public long Size { get; set; }
+    public string Type { get; set; }
 }
